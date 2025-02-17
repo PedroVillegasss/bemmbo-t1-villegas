@@ -28,10 +28,8 @@ export default function Main() {
   const [receivedInvoices, setReceivedInvoices] = useState([]);
   const [selectedReceivedInvoice, setSelectedReceivedInvoice] = useState('');
   const [selectedCreditNote, setSelectedCreditNote] = useState('');
-  const [creditNotesAssigned, setCreditNotesAssigned] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  const [selectedCreditNotes, setSelectedCreditNotes] = useState([]);
 
   // Obtener todas las facturas
   useEffect(() => {
@@ -65,7 +63,7 @@ export default function Main() {
     });
 
     /*
-      En este punto, creditNotesDict es de la forma 'id factura recibida': [sus notas de credito]:
+      En este punto, creditNotesDict es de la forma 'id factura recibida': [sus notas de crédito]:
 
       {
         "inv_KedI7Yt22XM64129": [
@@ -90,13 +88,13 @@ export default function Main() {
     setReceivedInvoices(receivedWithCreditNotes);
   };
 
-  // Cuando las facturas ya se hayan recibido desde el endpoint, se les agrega su nota de crédito con filterInvoices()
+  // Cuando las facturas ya se hayan obtenido desde el endpoint, agregarles sus notas de crédito
   useEffect(() => {
     filterInvoices();
   }, [invoices]);
   
 
-  // Funciones auxiliares para hacerlo bonito
+  // -------------- Funciones auxiliares para que quede bonito --------------
   function convertCLPtoDollar(clpAmount) {
     const exchangeRate = 0.0011; // 1 CLP = 0.0011 USD
     return (clpAmount * exchangeRate);
@@ -107,9 +105,17 @@ export default function Main() {
     return (usdAmount * exchangeRate);
   }
 
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
+
+    // Para reiniciar el flujo después de cerrar el modal
+    setSelectedReceivedInvoice('');
+    setSelectedCreditNote(''); 
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => input.checked = false);
+  };
+
   const handleShowModal = () => setShowModal(true);
-  // Funciones auxiliares para hacerlo bonito
+  // -------------------------------------------------------------------------- 
 
   return (
     <div className='main-container'>
@@ -154,6 +160,7 @@ export default function Main() {
               </div>
             ))}
 
+
             {/* Si se seleccionó una factura, desplegar sus notas de crédito */}
             {selectedReceivedInvoice && (
               <>
@@ -195,12 +202,14 @@ export default function Main() {
                   ))
                 }
 
+
                 {/* Si hay una factura seleccionada y una nota de crédito seleccionada... */}
                 {selectedReceivedInvoice && selectedCreditNote && (
                   <button id="assignButton" onClick={handleShowModal} style={{marginTop: '20px', padding: '17px 57px', marginBottom: '50px', background: 'linear-gradient(to bottom, blue, #00001cc3)'}}>
                     Asignar
                   </button>
                 )}
+                
                 
                 {/* Modal */}
                 {showModal && (
